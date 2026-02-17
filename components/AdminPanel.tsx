@@ -46,30 +46,38 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ products, setProducts, slides, 
 
   const totalSales = orders.reduce((sum, o) => sum + o.total, 0);
 
-  // IMAGE COMPRESSION UTILITY
+  // IMPROVED IMAGE COMPRESSION UTILITY (Fixes black background issue)
   const compressImage = (base64Str: string, maxWidth = 800): Promise<string> => {
     return new Promise((resolve) => {
       const img = new Image();
-      img.src = base64Str;
+      img.crossOrigin = "anonymous";
       img.onload = () => {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
+        
         if (width > maxWidth) {
           height = (maxWidth / width) * height;
           width = maxWidth;
         }
+        
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
+        
         if (ctx) {
+          // Fill background with white to avoid black boxes for transparent PNGs converted to JPEG
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', 0.8));
+          // Using JPEG to keep file size small for LocalStorage
+          resolve(canvas.toDataURL('image/jpeg', 0.7));
         } else {
           resolve(base64Str);
         }
       };
       img.onerror = () => resolve(base64Str);
+      img.src = base64Str;
     });
   };
 
@@ -108,9 +116,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ products, setProducts, slides, 
       setIsProcessingImage(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
-        const compressed = await compressImage(reader.result as string, 600);
-        setProductFormData(prev => ({ ...prev, image: compressed }));
-        setIsProcessingImage(false);
+        try {
+          const compressed = await compressImage(reader.result as string, 600);
+          setProductFormData(prev => ({ ...prev, image: compressed }));
+        } catch (err) {
+          console.error("Image processing failed", err);
+        } finally {
+          setIsProcessingImage(false);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -162,9 +175,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ products, setProducts, slides, 
       setIsProcessingImage(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
-        const compressed = await compressImage(reader.result as string, 1200);
-        setSlideFormData(prev => ({ ...prev, image: compressed }));
-        setIsProcessingImage(false);
+        try {
+          const compressed = await compressImage(reader.result as string, 1000);
+          setSlideFormData(prev => ({ ...prev, image: compressed }));
+        } catch (err) {
+          console.error("Slide image processing failed", err);
+        } finally {
+          setIsProcessingImage(false);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -274,7 +292,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ products, setProducts, slides, 
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead><tr className="bg-gray-50 text-[10px] font-bold text-gray-500 uppercase tracking-widest"><th className="px-6 py-4">পণ্য</th><th className="px-6 py-4">ক্যাটাগরি</th><th className="px-6 py-4">দাম</th><th className="px-6 py-4 text-right">অ্যাকশন</th></tr></thead>
-                  <tbody className="divide-y">{products.map(p => (<tr key={p.id} className="hover:bg-gray-50 transition"><td className="px-6 py-4"><div className="flex items-center gap-3"><img src={p.image} className="w-10 h-10 rounded-lg object-cover bg-gray-100" /><span className="font-bold text-gray-800">{p.name}</span></div></td><td className="px-6 py-4 text-sm font-medium text-gray-500">{p.category}</td><td className="px-6 py-4 font-bold text-emerald-700">৳ {p.price}</td><td className="px-6 py-4 text-right"><div className="flex justify-end gap-2"><button onClick={() => handleEditProductClick(p)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition"><Edit size={18} /></button><button onClick={() => deleteProduct(p.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition"><Trash2 size={18} /></button></div></td></tr>))}</tbody>
+                  <tbody className="divide-y">{products.map(p => (<tr key={p.id} className="hover:bg-gray-50 transition"><td className="px-6 py-4"><div className="flex items-center gap-3"><img src={p.image} className="w-10 h-10 rounded-lg object-cover bg-gray-100" alt="" /><span className="font-bold text-gray-800">{p.name}</span></div></td><td className="px-6 py-4 text-sm font-medium text-gray-500">{p.category}</td><td className="px-6 py-4 font-bold text-emerald-700">৳ {p.price}</td><td className="px-6 py-4 text-right"><div className="flex justify-end gap-2"><button onClick={() => handleEditProductClick(p)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition"><Edit size={18} /></button><button onClick={() => deleteProduct(p.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition"><Trash2 size={18} /></button></div></td></tr>))}</tbody>
                 </table>
               </div>
             </div>
@@ -289,7 +307,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ products, setProducts, slides, 
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead><tr className="bg-gray-50 text-[10px] font-bold text-gray-500 uppercase tracking-widest"><th className="px-6 py-4">স্লাইড ইমেজ</th><th className="px-6 py-4">শিরোনাম ও তথ্য</th><th className="px-6 py-4 text-right">অ্যাকশন</th></tr></thead>
-                  <tbody className="divide-y">{slides.map(s => (<tr key={s.id} className="hover:bg-gray-50 transition"><td className="px-6 py-4"><img src={s.image} className="w-24 h-12 rounded-lg object-cover bg-gray-100 border" /></td><td className="px-6 py-4"><p className="font-bold text-gray-800">{s.title}</p><p className="text-xs text-gray-500 line-clamp-1">{s.subtitle}</p></td><td className="px-6 py-4 text-right"><div className="flex justify-end gap-2"><button onClick={() => handleEditSlideClick(s)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition"><Edit size={18} /></button><button onClick={() => deleteSlide(s.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition"><Trash2 size={18} /></button></div></td></tr>))}</tbody>
+                  <tbody className="divide-y">{slides.map(s => (<tr key={s.id} className="hover:bg-gray-50 transition"><td className="px-6 py-4"><img src={s.image} className="w-24 h-12 rounded-lg object-cover bg-gray-100 border" alt="" /></td><td className="px-6 py-4"><p className="font-bold text-gray-800">{s.title}</p><p className="text-xs text-gray-500 line-clamp-1">{s.subtitle}</p></td><td className="px-6 py-4 text-right"><div className="flex justify-end gap-2"><button onClick={() => handleEditSlideClick(s)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition"><Edit size={18} /></button><button onClick={() => deleteSlide(s.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition"><Trash2 size={18} /></button></div></td></tr>))}</tbody>
                 </table>
               </div>
             </div>
@@ -326,22 +344,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ products, setProducts, slides, 
             <form onSubmit={handleProductSubmit} className="p-6 space-y-4 overflow-y-auto no-scrollbar bg-white">
               <div className="flex flex-col items-center">
                 <div className="relative group w-32 h-32 rounded-2xl overflow-hidden border-4 border-dashed border-emerald-100 bg-emerald-50/50 flex items-center justify-center mb-2">
-                  {isProcessingImage ? <Loader2 size={32} className="animate-spin text-emerald-600" /> : <img src={productFormData.image} className="w-full h-full object-cover" />}
+                  {isProcessingImage ? <Loader2 size={32} className="animate-spin text-emerald-600" /> : <img src={productFormData.image} className="w-full h-full object-cover" alt="" />}
                   <button type="button" onClick={() => fileInputRef.current?.click()} className="absolute inset-0 bg-black/40 text-white opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center text-[10px] font-bold"><Upload size={24} className="mb-1" /> আপডেট করুন</button>
                 </div>
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleProductImageChange} />
               </div>
-              <div className="space-y-4">
-                <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">পণ্যের নাম</label><input required value={productFormData.name} onChange={e => setProductFormData(p => ({...p, name: e.target.value}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-gray-900 bg-white font-bold focus:border-emerald-500 outline-none" placeholder="যেমন: মিনিকেট চাল" /></div>
+              <div className="space-y-4 text-black">
+                <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">পণ্যের নাম</label><input required value={productFormData.name} onChange={e => setProductFormData(p => ({...p, name: e.target.value}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-black bg-white font-bold focus:border-emerald-500 outline-none" placeholder="যেমন: মিনিকেট চাল" /></div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">ক্যাটাগরি</label><select value={productFormData.category} onChange={e => setProductFormData(p => ({...p, category: e.target.value as Category}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-gray-900 bg-white font-bold focus:border-emerald-500 outline-none">{Object.values(Category).filter(c => c !== Category.ALL).map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-                  <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">ইউনিট</label><input required value={productFormData.unit} onChange={e => setProductFormData(p => ({...p, unit: e.target.value}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-gray-900 bg-white font-bold focus:border-emerald-500 outline-none" placeholder="যেমন: কেজি" /></div>
+                  <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">ক্যাটাগরি</label><select value={productFormData.category} onChange={e => setProductFormData(p => ({...p, category: e.target.value as Category}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-black bg-white font-bold focus:border-emerald-500 outline-none">{Object.values(Category).filter(c => c !== Category.ALL).map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+                  <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">ইউনিট</label><input required value={productFormData.unit} onChange={e => setProductFormData(p => ({...p, unit: e.target.value}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-black bg-white font-bold focus:border-emerald-500 outline-none" placeholder="যেমন: কেজি" /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">দাম (৳)</label><input required type="number" value={productFormData.price} onChange={e => setProductFormData(p => ({...p, price: e.target.value}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-gray-900 bg-white font-bold focus:border-emerald-500 outline-none" placeholder="০০.০০" /></div>
-                  <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">স্টক</label><input required type="number" value={productFormData.stock} onChange={e => setProductFormData(p => ({...p, stock: e.target.value}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-gray-900 bg-white font-bold focus:border-emerald-500 outline-none" placeholder="যেমন: ১০০" /></div>
+                  <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">দাম (৳)</label><input required type="number" value={productFormData.price} onChange={e => setProductFormData(p => ({...p, price: e.target.value}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-black bg-white font-bold focus:border-emerald-500 outline-none" placeholder="০০.০০" /></div>
+                  <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">স্টক</label><input required type="number" value={productFormData.stock} onChange={e => setProductFormData(p => ({...p, stock: e.target.value}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-black bg-white font-bold focus:border-emerald-500 outline-none" placeholder="যেমন: ১০০" /></div>
                 </div>
-                <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">বর্ণনা</label><textarea value={productFormData.description} onChange={e => setProductFormData(p => ({...p, description: e.target.value}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-gray-900 bg-white font-bold focus:border-emerald-500 outline-none" placeholder="বিস্তারিত তথ্য..." rows={2}></textarea></div>
+                <div><label className="block text-xs font-bold text-emerald-700 uppercase mb-1">বর্ণনা</label><textarea value={productFormData.description} onChange={e => setProductFormData(p => ({...p, description: e.target.value}))} className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-black bg-white font-bold focus:border-emerald-500 outline-none" placeholder="বিস্তারিত তথ্য..." rows={2}></textarea></div>
               </div>
               <div className="flex gap-4 pt-4 sticky bottom-0 bg-white border-t mt-4">
                 <button type="button" onClick={() => setIsProductModalOpen(false)} className="flex-1 px-6 py-4 border-2 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition">ফিরে যান</button>
@@ -352,7 +370,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ products, setProducts, slides, 
         </div>
       )}
 
-      {/* Slide Modal - REFINED CONTRAST AND VISIBILITY */}
+      {/* Slide Modal */}
       {isSlideModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
           <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-emerald-100">
@@ -362,7 +380,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ products, setProducts, slides, 
             </div>
             
             <form onSubmit={handleSlideSubmit} className="p-6 space-y-5 overflow-y-auto no-scrollbar bg-white">
-              {/* Image Upload Area with loader */}
               <div className="space-y-2">
                 <label className="block text-xs font-black text-emerald-700 uppercase tracking-widest">স্লাইডার ইমেজ আপডেট</label>
                 <div className="relative group w-full h-44 rounded-2xl overflow-hidden border-4 border-dashed border-emerald-100 bg-emerald-50/20 flex items-center justify-center transition-all hover:border-emerald-400">
@@ -374,7 +391,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ products, setProducts, slides, 
                 <input type="file" ref={slideFileInputRef} className="hidden" accept="image/*" onChange={handleSlideImageChange} />
               </div>
 
-              {/* Input Fields with Max Contrast */}
               <div className="space-y-5">
                 <div>
                   <label className="block text-xs font-black text-emerald-800 uppercase tracking-widest mb-1.5 ml-1">স্লাইড টাইটেল</label>
@@ -392,7 +408,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ products, setProducts, slides, 
                 </div>
               </div>
 
-              {/* Bottom Sticky Action Buttons */}
               <div className="flex gap-4 pt-4 sticky bottom-0 bg-white border-t mt-6">
                 <button type="button" onClick={() => setIsSlideModalOpen(false)} className="flex-1 px-6 py-4 border-2 border-gray-100 rounded-2xl font-black text-gray-500 hover:bg-gray-100 transition active:scale-95">ফিরে যান</button>
                 <button type="submit" disabled={isProcessingImage} className="flex-1 bg-emerald-700 text-white px-6 py-4 rounded-2xl font-black text-xl hover:bg-emerald-800 shadow-xl shadow-emerald-100 transition transform active:scale-95 flex items-center justify-center gap-2">
