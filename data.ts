@@ -28,7 +28,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 55,
     unit: 'কেজি',
     category: Category.VEGETABLES,
-    image: 'https://images.unsplash.com/photo-1508313880080-c4bef0730395?auto=format&fit=crop&q=80&w=400',
+    image: 'https://images.unsplash.com/photo-1518977676601-b53f02bad67b?auto=format&fit=crop&q=80&w=400',
     description: 'ক্ষেত থেকে তোলা একদম তাজা ও পুষ্টিকর লাল আলু।',
     stock: 200
   },
