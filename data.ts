@@ -1,5 +1,5 @@
 
-import { Category, Product } from './types';
+import { Category, Product, Slide } from './types';
 
 export const INITIAL_PRODUCTS: Product[] = [
   {
@@ -61,5 +61,29 @@ export const INITIAL_PRODUCTS: Product[] = [
     image: 'https://picsum.photos/seed/cola/400/300',
     description: 'ঠান্ডা রিফ্রেশিং পানীয়।',
     stock: 80
+  }
+];
+
+export const INITIAL_SLIDES: Slide[] = [
+  {
+    id: 's1',
+    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200',
+    title: 'টাটকা ও সতেজ বাজার একদম ঘরের দরজায়!',
+    subtitle: 'বদলগাছীর সবচেয়ে বিশ্বস্ত অনলাইন গ্রোসরি শপ। ১ ঘণ্টার মধ্যে ডেলিভারি নিশ্চিত।',
+    buttonText: 'বাজার শুরু করুন'
+  },
+  {
+    id: 's2',
+    image: 'https://images.unsplash.com/photo-1543083477-4f77cdaae6d2?auto=format&fit=crop&q=80&w=1200',
+    title: 'সাপ্তাহিক ধামাকা অফার!',
+    subtitle: 'চাল, ডাল এবং তেলের ওপর পান বিশেষ মূল্যছাড়। অফার সীমিত সময়ের জন্য।',
+    buttonText: 'অফার দেখুন'
+  },
+  {
+    id: 's3',
+    image: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&q=80&w=1200',
+    title: 'সুস্থ থাকুন, নিরাপদ পণ্য কিনুন',
+    subtitle: 'আমরা দিচ্ছি ১০০% ভেজালমুক্ত পণ্যের নিশ্চয়তা। আপনার পরিবারের স্বাস্থ্য আমাদের অগ্রাধিকার।',
+    buttonText: 'আমাদের সম্পর্কে'
   }
 ];

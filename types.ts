@@ -21,6 +21,14 @@ export interface Product {
   stock: number;
 }
 
+export interface Slide {
+  id: string;
+  image: string;
+  title: string;
+  subtitle: string;
+  buttonText: string;
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;

@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { ShoppingCart, User, Store, Info, Phone, Search, Menu, X, Trash2, Plus, Minus, ArrowRight, Settings } from 'lucide-react';
-import { ViewType, Category, Product, CartItem, Order } from './types';
-import { INITIAL_PRODUCTS } from './data';
+import { ShoppingCart, User, Store, Info, Phone, Search, Menu, X, Trash2, Plus, Minus, ArrowRight, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ViewType, Category, Product, CartItem, Order, Slide } from './types';
+import { INITIAL_PRODUCTS, INITIAL_SLIDES } from './data';
 import AdminPanel from './components/AdminPanel';
 import CartSidebar from './components/CartSidebar';
 import ProductCard from './components/ProductCard';
@@ -13,6 +13,10 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('samsul_products');
     return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
   });
+  const [slides, setSlides] = useState<Slide[]>(() => {
+    const saved = localStorage.getItem('samsul_slides');
+    return saved ? JSON.parse(saved) : INITIAL_SLIDES;
+  });
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeCategory, setActiveCategory] = useState<Category>(Category.ALL);
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,11 +26,27 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('samsul_orders');
     return saved ? JSON.parse(saved) : [];
   });
+  
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Auto-play slider
+  useEffect(() => {
+    if (view === 'STORE' && slides.length > 0) {
+      const timer = setInterval(() => {
+        setCurrentSlide(prev => (prev + 1) % slides.length);
+      }, 5000);
+      return () => clearInterval(timer);
+    }
+  }, [view, slides.length]);
 
   // Sync state to local storage
   useEffect(() => {
     localStorage.setItem('samsul_products', JSON.stringify(products));
   }, [products]);
+
+  useEffect(() => {
+    localStorage.setItem('samsul_slides', JSON.stringify(slides));
+  }, [slides]);
 
   useEffect(() => {
     localStorage.setItem('samsul_orders', JSON.stringify(orders));
@@ -104,6 +124,9 @@ const App: React.FC = () => {
     </button>
   );
 
+  const nextSlide = () => setCurrentSlide(prev => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -111,39 +134,52 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
-            <div className="flex items-center gap-4 cursor-pointer" onClick={() => setView('STORE')}>
+            <div className="flex items-center gap-4 cursor-pointer shrink-0" onClick={() => setView('STORE')}>
               <div className="bg-emerald-600 p-2 rounded-lg text-white shadow-md">
                 <Store size={28} />
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-xl md:text-2xl font-bold text-emerald-800 leading-none">সামসুল'স গ্রোসরি</h1>
-                <p className="text-[10px] md:text-xs text-gray-500 font-medium mt-1">চার মাথার মোড়, বদলগাছী</p>
+                <p className="text-[10px] md:text-xs text-gray-500 font-medium mt-1">বদলগাছী, নওগাঁ</p>
+              </div>
+            </div>
+
+            {/* STUNNING ENHANCED WELCOME TEXT */}
+            <div className="hidden lg:flex flex-1 justify-center items-center px-4 overflow-hidden">
+              <div className="text-center animate-welcome cursor-default select-none">
+                <p className="text-lg md:text-xl lg:text-2xl font-black italic uppercase tracking-[0.2em] bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 bg-clip-text text-transparent">
+                  WELCOME TO SAMSUL'S GROCERY
+                </p>
+                <div className="flex items-center justify-center gap-4 mt-0.5">
+                   <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-emerald-400"></div>
+                   <span className="text-[10px] font-bold text-emerald-600/60 tracking-[0.3em] uppercase">Premium Local Service</span>
+                   <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-emerald-400"></div>
+                </div>
               </div>
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1 mx-4">
+            <nav className="hidden xl:flex items-center gap-1 mx-2">
               <NavItem label="হোম" viewTarget="STORE" icon={<Store size={18} />} />
-              <NavItem label="আমাদের সম্পর্কে" viewTarget="ABOUT" icon={<Info size={18} />} />
               <NavItem label="অ্যাডমিন" viewTarget="ADMIN" icon={<Settings size={18} />} />
             </nav>
 
             {/* Desktop Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-sm lg:max-w-md mx-4">
+            <div className="hidden md:flex items-center max-w-[150px] lg:max-w-[200px] ml-auto mr-4">
               <div className="relative w-full">
                 <input
                   type="text"
-                  placeholder="পণ্য খুঁজুন (যেমন: চাল, ডাল...)"
-                  className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                  placeholder="খুঁজুন..."
+                  className="w-full pl-9 pr-3 py-1.5 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-xs"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                <Search className="absolute left-3 top-2 text-gray-400" size={14} />
               </div>
             </div>
 
             {/* Actions (Cart & Mobile Menu) */}
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
               <button 
                 onClick={() => setIsCartOpen(true)}
                 className="relative p-2.5 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-full transition-all duration-200"
@@ -172,7 +208,8 @@ const App: React.FC = () => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-b absolute top-20 left-0 w-full z-30 animate-fade-in shadow-xl">
-          <div className="px-4 py-6 space-y-6">
+          <div className="px-4 py-6 space-y-6 text-center">
+            <p className="text-emerald-700 font-black italic uppercase text-xs tracking-widest">Welcome to Samsul's Grocery</p>
             <div className="relative">
               <input
                 type="text"
@@ -201,31 +238,62 @@ const App: React.FC = () => {
       <main className="flex-grow">
         {view === 'STORE' && (
           <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 animate-fade-in">
-            {/* Hero Section */}
-            <div className="relative rounded-3xl overflow-hidden mb-10 h-56 sm:h-72 md:h-96 shadow-xl group">
-              <img 
-                src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200" 
-                alt="Banner" 
-                className="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition duration-[2s]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/90 via-emerald-900/40 to-transparent flex flex-col justify-center px-8 sm:px-16">
-                <span className="bg-emerald-500 text-white text-xs font-black px-3 py-1 rounded-full w-fit mb-4 tracking-widest uppercase">বদলগাছী স্পেশাল</span>
-                <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-white mb-4 leading-tight">
-                  টাটকা ও সতেজ বাজার <br/> একদম ঘরের দরজায়!
-                </h2>
-                <p className="text-emerald-100 text-base sm:text-xl font-medium max-w-lg mb-8 opacity-90">
-                  বদলগাছীর সবচেয়ে বিশ্বস্ত অনলাইন গ্রোসরি শপ। ১ ঘণ্টার মধ্যে ডেলিভারি নিশ্চিত।
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <button onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })} className="bg-white text-emerald-900 px-8 py-3.5 rounded-full font-black hover:bg-emerald-50 transition transform hover:-translate-y-1 shadow-xl">
-                    বাজার শুরু করুন
-                  </button>
-                  <a href="https://wa.me/8801700000000" target="_blank" rel="noreferrer" className="bg-green-500 text-white px-8 py-3.5 rounded-full font-black flex items-center gap-2 hover:bg-green-600 transition transform hover:-translate-y-1 shadow-xl">
-                    <Phone size={20} /> সাহায্য নিন
-                  </a>
+            {/* Dynamic Slider Section */}
+            {slides.length > 0 && (
+              <div className="relative rounded-3xl overflow-hidden mb-10 h-56 sm:h-72 md:h-96 shadow-xl group bg-emerald-900">
+                {slides.map((slide, index) => (
+                  <div 
+                    key={slide.id} 
+                    className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110 pointer-events-none'}`}
+                  >
+                    <img 
+                      src={slide.image} 
+                      alt={slide.title} 
+                      className="w-full h-full object-cover opacity-60"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/90 via-emerald-900/40 to-transparent flex flex-col justify-center px-8 sm:px-16">
+                      <span className="bg-emerald-500 text-white text-[10px] md:text-xs font-black px-3 py-1 rounded-full w-fit mb-4 tracking-widest uppercase animate-fade-in">বদলগাছী স্পেশাল</span>
+                      <h2 className="text-xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 leading-tight max-w-2xl drop-shadow-lg">
+                        {slide.title}
+                      </h2>
+                      <p className="text-emerald-100 text-xs sm:text-lg md:text-xl font-medium max-w-lg mb-8 opacity-90 drop-shadow-md">
+                        {slide.subtitle}
+                      </p>
+                      <div className="flex flex-wrap gap-4">
+                        <button 
+                          onClick={() => {
+                            if (slide.buttonText === 'আমাদের সম্পর্কে') setView('ABOUT');
+                            else document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+                          }} 
+                          className="bg-white text-emerald-900 px-6 py-2.5 md:px-8 md:py-3.5 rounded-full font-black hover:bg-emerald-50 transition transform hover:-translate-y-1 shadow-xl text-sm md:text-base"
+                        >
+                          {slide.buttonText}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Slider Controls */}
+                <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition duration-300">
+                  <ChevronLeft size={24} />
+                </button>
+                <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition duration-300">
+                  <ChevronRight size={24} />
+                </button>
+
+                {/* Dots */}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                  {slides.map((_, idx) => (
+                    <button 
+                      key={idx} 
+                      onClick={() => setCurrentSlide(idx)}
+                      className={`h-2 rounded-full transition-all duration-300 ${idx === currentSlide ? 'w-8 bg-emerald-500' : 'w-2 bg-white/50'}`}
+                    />
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Categories */}
             <div className="mb-10">
@@ -288,6 +356,8 @@ const App: React.FC = () => {
             <AdminPanel 
               products={products} 
               setProducts={setProducts} 
+              slides={slides}
+              setSlides={setSlides}
               orders={orders} 
               setOrders={setOrders}
             />
