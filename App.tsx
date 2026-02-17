@@ -226,7 +226,7 @@ const App: React.FC = () => {
               <NavItem label="অ্যাডমিন ড্যাশবোর্ড" viewTarget="ADMIN" icon={<Settings size={20} />} />
             </nav>
             <div className="pt-4 border-t flex flex-col gap-4">
-               <a href="https://wa.me/8801700000000" target="_blank" rel="noreferrer" className="w-full bg-green-500 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2">
+               <a href="https://wa.me/88017341214" target="_blank" rel="noreferrer" className="w-full bg-green-500 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2">
                  <Phone size={18} /> হোয়াটস্যাপে অর্ডার দিন
                </a>
             </div>
@@ -386,7 +386,7 @@ const App: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-black text-gray-700 mb-2">মোবাইল নম্বর *</label>
-                  <input required name="phone" type="tel" className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 outline-none transition" placeholder="০১৭০০-০০০০০০" />
+                  <input required name="phone" type="tel" className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 outline-none transition" placeholder="০১৭৩৪-১২১৪" />
                 </div>
                 <div>
                   <label className="block text-sm font-black text-gray-700 mb-2">ডেলিভারি ঠিকানা *</label>
@@ -477,7 +477,7 @@ const App: React.FC = () => {
                      <Phone size={32} />
                    </div>
                    <h4 className="text-xl font-black text-emerald-900 mb-2">আমাদের ফোন করুন</h4>
-                   <p className="text-gray-600 font-bold text-lg">+৮৮০ ১৭০০ ০০০০০০</p>
+                   <p className="text-gray-600 font-bold text-lg">+৮৮০ ১৭৩৪-১২১৪</p>
                    <p className="text-gray-400 text-sm mt-1">সকাল ৭টা - রাত ১০টা</p>
                  </div>
                  <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 flex flex-col items-center text-center">
@@ -535,7 +535,7 @@ const App: React.FC = () => {
                 </p>
                 <p className="flex items-center gap-3">
                    <Phone className="text-emerald-500 shrink-0" size={18} />
-                   <span>+৮৮০ ১৭০০ ০০০০০০</span>
+                   <span>+৮৮০ ১৭৩৪-১২১৪</span>
                 </p>
                 <div className="flex gap-4 mt-8">
                   <a href="#" className="bg-white/5 p-3 rounded-2xl hover:bg-emerald-600 hover:-translate-y-1 transition-all duration-300">
@@ -569,7 +569,7 @@ const App: React.FC = () => {
 
       {/* WhatsApp Floating Button */}
       <a 
-        href="https://wa.me/8801700000000" 
+        href="https://wa.me/88017341214" 
         target="_blank" 
         rel="noreferrer"
         className="fixed bottom-6 right-6 bg-green-500 text-white p-5 rounded-[1.5rem] shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 z-40 group"

@@ -8,8 +8,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 68,
     unit: 'কেজি',
     category: Category.RICE,
-    image: 'https://picsum.photos/seed/rice/400/300',
-    description: 'উন্নত মানের পরিষ্কার মিনিকেট চাল।',
+    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=400',
+    description: 'উন্নত মানের পরিষ্কার ও ঝকঝকে মিনিকেট চাল।',
     stock: 100
   },
   {
@@ -18,7 +18,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 380,
     unit: 'বোতল',
     category: Category.OIL,
-    image: 'https://picsum.photos/seed/oil/400/300',
+    image: 'https://images.unsplash.com/photo-1620706859477-e4abc8a7b2a7?auto=format&fit=crop&q=80&w=400',
     description: 'ভিটামিন এ সমৃদ্ধ খাঁটি সয়াবিন তেল।',
     stock: 50
   },
@@ -28,8 +28,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 55,
     unit: 'কেজি',
     category: Category.VEGETABLES,
-    image: 'https://picsum.photos/seed/potato/400/300',
-    description: 'ক্ষেত থেকে তোলা টাটকা লাল আলু।',
+    image: 'https://images.unsplash.com/photo-1508313880080-c4bef0730395?auto=format&fit=crop&q=80&w=400',
+    description: 'ক্ষেত থেকে তোলা একদম তাজা ও পুষ্টিকর লাল আলু।',
     stock: 200
   },
   {
@@ -38,7 +38,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 120,
     unit: 'ডজন',
     category: Category.FRUITS,
-    image: 'https://picsum.photos/seed/banana/400/300',
+    image: 'https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&q=80&w=400',
     description: 'মিষ্টি ও সুস্বাদু সবরি কলা।',
     stock: 30
   },
@@ -48,7 +48,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 45,
     unit: 'প্যাকেট',
     category: Category.SNACKS,
-    image: 'https://picsum.photos/seed/snacks/400/300',
+    image: 'https://images.unsplash.com/photo-1601050690597-df056fb46b45?auto=format&fit=crop&q=80&w=400',
     description: 'মচমচে এবং ঝাল চানাচুর।',
     stock: 100
   },
@@ -58,7 +58,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 40,
     unit: 'বোতল',
     category: Category.BEVERAGES,
-    image: 'https://picsum.photos/seed/cola/400/300',
+    image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=400',
     description: 'ঠান্ডা রিফ্রেশিং পানীয়।',
     stock: 80
   }
