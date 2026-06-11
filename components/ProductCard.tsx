@@ -10,13 +10,15 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onQuickView }) => {
+  const isOutOfStock = product.stock !== undefined && product.stock <= 0;
+
   return (
-    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group relative">
+    <div className={`bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group relative ${isOutOfStock ? 'opacity-70' : ''}`}>
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         <img 
           src={product.image} 
           alt={product.name} 
-          className="w-full h-full object-cover transform group-hover:scale-110 transition duration-700"
+          className={`w-full h-full object-cover transform transition duration-700 ${isOutOfStock ? 'scale-100 filter grayscale-[30%]' : 'group-hover:scale-110'}`}
         />
         
         {/* Hover Overlay */}
@@ -28,20 +30,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onQuick
            >
              <Eye size={20} />
            </button>
-           <button 
-             onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
-             className="bg-emerald-600 text-white p-3 rounded-2xl shadow-xl hover:scale-110 transition-transform active:scale-90"
-             title="ব্যাগে যোগ করুন"
-           >
-             <Plus size={20} />
-           </button>
+           {!isOutOfStock && (
+             <button 
+               onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
+               className="bg-emerald-600 text-white p-3 rounded-2xl shadow-xl hover:scale-110 transition-transform active:scale-90"
+               title="ব্যাগে যোগ করুন"
+             >
+               <Plus size={20} />
+             </button>
+           )}
         </div>
 
-        {product.stock < 10 && (
-          <div className="absolute top-4 left-4 bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow-sm">
-            স্টক সীমিত
+        {isOutOfStock ? (
+          <div className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm uppercase tracking-wide">
+            স্টক শেষ
           </div>
-        )}
+        ) : product.stock < 10 ? (
+          <div className="absolute top-4 left-4 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm">
+            স্টক সীমিত ({product.stock} {product.unit})
+          </div>
+        ) : null}
       </div>
 
       <div className="p-5 flex flex-col flex-grow cursor-pointer" onClick={onQuickView}>
@@ -59,12 +67,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onQuick
             </span>
             <span className="text-[10px] text-gray-400 font-bold mt-1 uppercase">প্রতি {product.unit}</span>
           </div>
-          <button 
-            onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
-            className="md:hidden bg-emerald-600 text-white p-2.5 rounded-xl active:scale-90 transition-all shadow-md shadow-emerald-100"
-          >
-            <Plus size={20} />
-          </button>
+          {isOutOfStock ? (
+            <span className="text-xs font-bold text-red-500 bg-red-50 px-2.5 py-1.5 rounded-lg border border-red-100">স্টক নেই</span>
+          ) : (
+            <button 
+              onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
+              className="md:hidden bg-emerald-600 text-white p-2.5 rounded-xl active:scale-90 transition-all shadow-md shadow-emerald-100"
+            >
+              <Plus size={20} />
+            </button>
+          )}
         </div>
       </div>
     </div>

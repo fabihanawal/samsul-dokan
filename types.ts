@@ -45,4 +45,4 @@ export interface Order {
   date: string;
 }
 
-export type ViewType = 'STORE' | 'ADMIN' | 'CHECKOUT' | 'ABOUT';
+export type ViewType = 'STORE' | 'ADMIN' | 'CHECKOUT' | 'ABOUT' | 'ORDER_SUCCESS' | 'SETUP_REQUIRED';
